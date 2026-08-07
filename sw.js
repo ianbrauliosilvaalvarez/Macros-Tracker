@@ -3,10 +3,10 @@ const urlsToCache = [
   '/',
   '/index.html',
   '/manifest.json',
-  '/icon.png' // Si tienes otros archivos CSS o JS externos, ponlos aquí
+  '/icon.png'
 ];
 
-// Instalación del Service Worker
+
 self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE_NAME)
@@ -16,7 +16,7 @@ self.addEventListener('install', event => {
   );
 });
 
-// Interceptar peticiones para servir contenido offline
+
 self.addEventListener('fetch', event => {
   event.respondWith(
     caches.match(event.request)
