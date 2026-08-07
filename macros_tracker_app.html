@@ -1,0 +1,2098 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Macros Tracker</title>
+    <style>
+        :root {
+            --bg-color: #121212;
+            --surface-color: #1e1e1e;
+            --surface-variant: #2c2c2c;
+            --primary: #bb86fc;
+            --secondary: #03dac6;
+            --error: #cf6679;
+            --text-primary: #ffffff;
+            --text-secondary: #aaaaaa;
+            --border-color: #333333;
+            
+            --success-color: #4caf50;
+            --warning-color: #ffeb3b;
+            --danger-color: #f44336;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            user-select: none;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            overflow-x: hidden;
+            padding-bottom: 70px; /* Space for bottom nav */
+        }
+
+        input, button, select {
+            font-family: inherit;
+        }
+
+        /* Top Navigation / Header */
+        header {
+            background-color: var(--surface-color);
+            padding: 15px 20px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* Bottom Navigation */
+        nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background-color: var(--surface-color);
+            display: flex;
+            justify-content: space-around;
+            padding: 10px 0;
+            border-top: 1px solid var(--border-color);
+            z-index: 100;
+        }
+
+        nav .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: var(--text-secondary);
+            font-size: 0.75rem;
+            cursor: pointer;
+        }
+
+        nav .nav-item.active {
+            color: var(--primary);
+        }
+
+        nav .nav-item svg {
+            width: 24px;
+            height: 24px;
+            margin-bottom: 4px;
+            fill: currentColor;
+        }
+
+        /* Tabs */
+        .tab-content {
+            display: none;
+            padding: 15px;
+            animation: fadeIn 0.2s ease-in;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Cards */
+        .card {
+            background-color: var(--surface-color);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+        }
+        
+        .card-header {
+            font-size: 1.1rem;
+            font-weight: bold;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 10px;
+        }
+
+        /* Circular Charts */
+        .dashboard {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 10px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .chart-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .chart-label {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            font-weight: bold;
+        }
+
+        .chart-value {
+            font-size: 0.75rem;
+            margin-top: 5px;
+        }
+
+        .progress-circle {
+            width: 72px;
+            height: 72px;
+            border-radius: 50%;
+            background: radial-gradient(closest-side, var(--surface-color) 78%, transparent 79% 100%),
+                        conic-gradient(var(--c) calc(var(--p) * 1%), var(--surface-variant) 0);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+
+        .progress-circle .inner-text {
+            font-size: 0.8rem;
+            font-weight: bold;
+            line-height: 1.1;
+            padding: 0 2px;
+        }
+
+        /* Forms and Inputs */
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 12px;
+        }
+
+        .input-group label {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-bottom: 5px;
+        }
+
+        input[type="number"], input[type="text"], select {
+            background-color: var(--surface-variant);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            width: 100%;
+            user-select: text;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .row {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .row .input-group {
+            flex: 1;
+        }
+
+        /* Buttons */
+        .btn {
+            background-color: var(--primary);
+            color: #000;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            text-align: center;
+            width: 100%;
+            transition: opacity 0.2s;
+        }
+
+        .btn:active {
+            opacity: 0.8;
+        }
+        
+        .btn.secondary {
+            background-color: var(--surface-variant);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn.small {
+            padding: 6px 12px;
+            font-size: 0.85rem;
+            width: auto;
+        }
+        
+        .btn.danger {
+            background-color: transparent;
+            color: var(--error);
+            border: 1px solid var(--error);
+        }
+
+        .btn.icon-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        /* Lists and Fast-Logging Items */
+        .food-list {
+            list-style: none;
+            margin-bottom: 10px;
+        }
+
+        .food-item-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid var(--border-color);
+            gap: 8px;
+        }
+        
+        .food-item-row:last-child {
+            border-bottom: none;
+        }
+
+        .food-item-info {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+        }
+
+        .food-item-name {
+            font-size: 0.9rem;
+            font-weight: 600;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .food-item-macros {
+            font-size: 0.72rem;
+            color: var(--text-secondary);
+            margin-top: 2px;
+        }
+
+        .food-item-qty-input {
+            width: 70px !important;
+            padding: 6px 8px !important;
+            text-align: center;
+            font-size: 0.9rem !important;
+            border-radius: 6px !important;
+        }
+
+        .food-delete {
+            color: var(--error);
+            font-size: 1.2rem;
+            cursor: pointer;
+            padding: 4px 6px;
+        }
+
+        .section-name-input {
+            flex: 1;
+        }
+
+        /* Quick Add Inline Box */
+        .inline-add-box {
+            display: flex;
+            gap: 8px;
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px dashed var(--border-color);
+            align-items: center;
+        }
+
+        .inline-add-box input[type="text"] {
+            flex: 2;
+            padding: 8px 10px;
+            font-size: 0.9rem;
+        }
+
+        .inline-add-box input[type="number"] {
+            flex: 1;
+            padding: 8px 10px;
+            font-size: 0.9rem;
+            text-align: center;
+        }
+
+        /* Colors for Remaining Macros */
+        .status-green { color: var(--success-color); }
+        .status-yellow { color: var(--warning-color); }
+        .status-red { color: var(--danger-color); }
+
+        /* Tables */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+            margin-top: 10px;
+        }
+        
+        th, td {
+            text-align: right;
+            padding: 8px 4px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        th:first-child, td:first-child {
+            text-align: left;
+        }
+        
+        th {
+            color: var(--text-secondary);
+            font-weight: normal;
+        }
+        
+        .summary-row {
+            font-weight: bold;
+            color: var(--primary);
+            border-top: 1px solid var(--text-secondary);
+        }
+
+        .collapsible-header {
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .collapsible-content {
+            height: 0;
+            opacity: 0;
+            overflow: hidden;
+        }
+        
+        .collapsible-content.open {
+            height: auto;
+            opacity: 1;
+            margin-top: 15px;
+        }
+        
+        /* Modals */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.7);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .modal.active { display: flex; }
+        .modal-content {
+            background: var(--bg-color);
+            padding: 20px;
+            border-radius: 12px;
+            width: 100%;
+            max-width: 400px;
+            max-height: 90vh;
+            overflow-y: auto;
+            border: 1px solid var(--border-color);
+        }
+
+        /* Custom autocomplete dropdown (replaces native <datalist>) */
+        .autocomplete-dropdown {
+            display: none;
+            position: fixed;
+            background: var(--surface-variant);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            max-height: 160px;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            z-index: 2000;
+            box-shadow: 0 6px 16px rgba(0,0,0,0.45);
+        }
+
+        .autocomplete-dropdown.active {
+            display: block;
+        }
+
+        .autocomplete-item {
+            padding: 10px 12px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .autocomplete-item:last-child {
+            border-bottom: none;
+        }
+
+        .autocomplete-item:active {
+            background: var(--surface-color);
+            color: var(--primary);
+        }
+
+        /* Dashboard carousel (circular <-> bar view) */
+        .dashboard-carousel {
+            overflow: hidden;
+            position: relative;
+        }
+
+        .dashboard-page {
+            display: none;
+        }
+
+        .dashboard-page.active {
+            display: block;
+        }
+
+        .dashboard-page.slide-in-right {
+            animation: slideInRight 0.32s ease;
+        }
+
+        .dashboard-page.slide-in-left {
+            animation: slideInLeft 0.32s ease;
+        }
+
+        @keyframes slideInRight {
+            from { opacity: 0; transform: translateX(40px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        @keyframes slideInLeft {
+            from { opacity: 0; transform: translateX(-40px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .dashboard-nav {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+            margin-top: 8px;
+        }
+
+        .dash-arrow {
+            color: var(--text-secondary);
+            font-size: 1.3rem;
+            font-weight: bold;
+            cursor: pointer;
+            padding: 4px 10px;
+            line-height: 1;
+        }
+
+        .dash-arrow:active {
+            color: var(--primary);
+        }
+
+        .dash-dots {
+            display: flex;
+            gap: 8px;
+        }
+
+        .dash-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: var(--surface-variant);
+            transition: background 0.2s ease, transform 0.2s ease;
+            cursor: pointer;
+        }
+
+        .dash-dot.active {
+            background: var(--primary);
+            transform: scale(1.3);
+        }
+
+        /* Bar-style macro diagram (alt dashboard view) */
+        .macro-bar-row {
+            margin-bottom: 18px;
+        }
+
+        .macro-bar-row:last-child {
+            margin-bottom: 4px;
+        }
+
+        .macro-bar-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            margin-bottom: 7px;
+            gap: 10px;
+        }
+
+        .macro-bar-label {
+            font-size: 1rem;
+            font-weight: bold;
+        }
+
+        .macro-bar-sub {
+            font-size: 0.82rem;
+            font-weight: normal;
+            color: var(--text-secondary);
+        }
+
+        .macro-bar-remaining {
+            font-size: 1.05rem;
+            font-weight: bold;
+            white-space: nowrap;
+        }
+
+        .macro-bar-track {
+            width: 100%;
+            height: 10px;
+            border-radius: 6px;
+            background: var(--surface-variant);
+            overflow: hidden;
+        }
+
+        .macro-bar-fill {
+            height: 100%;
+            border-radius: 6px;
+            width: 0%;
+            transition: width 0.6s ease;
+        }
+
+        /* Water tracking card */
+        .water-input-row {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .water-header-value {
+            font-size: 0.8rem;
+            font-weight: normal;
+            color: var(--secondary);
+        }
+
+        /* Smart-sorted DB group headers */
+        .db-group-header td {
+            padding-top: 14px !important;
+            padding-bottom: 4px !important;
+            font-size: 0.7rem !important;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            color: var(--primary) !important;
+            border-bottom: 1px solid var(--border-color) !important;
+        }
+
+        .db-group-header:first-child td {
+            padding-top: 4px !important;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <span>Macros Tracker</span>
+        <button class="btn small danger" onclick="resetDay()">Reiniciar Día</button>
+    </header>
+
+    <!-- TAB 1: MACROS TARGETS -->
+    <div id="tab-macros" class="tab-content">
+        <div class="card">
+            <div class="card-header">Objetivos Diarios</div>
+            <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 15px;">
+                Ingresa tus macros objetivo. Las Kcal se calculan automáticamente (Atwater: Px4, Cx4, Gx9).
+            </p>
+            <div class="input-group">
+                <label>Proteína (g)</label>
+                <input type="number" id="target-p" placeholder="Ej. 125">
+            </div>
+            <div class="input-group">
+                <label>Carbohidratos (g)</label>
+                <input type="number" id="target-c" placeholder="Ej. 285">
+            </div>
+            <div class="input-group">
+                <label>Grasas (g)</label>
+                <input type="number" id="target-f" placeholder="Ej. 40">
+            </div>
+            <div class="input-group">
+                <label>Agua (L)</label>
+                <input type="number" id="target-water" placeholder="Ej. 3" step="0.1">
+            </div>
+            <div class="input-group" style="margin-top: 10px;">
+                <label>Total Kcal Calculadas:</label>
+                <div id="target-kcal-display" style="font-size: 1.5rem; font-weight: bold; color: var(--primary);">0</div>
+            </div>
+            <button class="btn" onclick="saveTargets()" style="margin-top: 10px;">Guardar Objetivos</button>
+        </div>
+
+        <div class="card">
+            <div class="card-header">Secciones de Comidas</div>
+            <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 15px;">
+                Personaliza los nombres y la cantidad de secciones para registrar tu ingesta.
+            </p>
+            <div id="meal-sections-list"></div>
+            <button class="btn secondary small" onclick="addMealSectionField()" style="margin-top: 10px; width: 100%;">+ Agregar Sección</button>
+            <button class="btn" onclick="saveMealSectionsFromUI()" style="margin-top: 15px;">Guardar Secciones</button>
+        </div>
+    </div>
+
+    <!-- TAB 2: INGESTA -->
+    <div id="tab-ingesta" class="tab-content active">
+        <!-- Dashboard: circular <-> bar view carousel -->
+        <div class="card">
+            <div class="dashboard-carousel">
+            <div class="dashboard-page active" id="dashboard-page-circular">
+                <div class="dashboard">
+                    <div class="chart-container">
+                        <div class="chart-label">Kcal</div>
+                        <div class="progress-circle" id="chart-kcal" style="--p: 0; --c: var(--primary);">
+                            <span class="inner-text" id="dash-kcal-text">0</span>
+                        </div>
+                        <div class="chart-value" id="dash-kcal-rem">0</div>
+                    </div>
+                    <div class="chart-container">
+                        <div class="chart-label">Proteína</div>
+                        <div class="progress-circle" id="chart-p" style="--p: 0; --c: #4caf50;">
+                            <span class="inner-text" id="dash-p-text">0g</span>
+                        </div>
+                        <div class="chart-value" id="dash-p-rem">0</div>
+                    </div>
+                    <div class="chart-container">
+                        <div class="chart-label">Carbos</div>
+                        <div class="progress-circle" id="chart-c" style="--p: 0; --c: #2196f3;">
+                            <span class="inner-text" id="dash-c-text">0g</span>
+                        </div>
+                        <div class="chart-value" id="dash-c-rem">0</div>
+                    </div>
+                    <div class="chart-container">
+                        <div class="chart-label">Grasas</div>
+                        <div class="progress-circle" id="chart-f" style="--p: 0; --c: #ff9800;">
+                            <span class="inner-text" id="dash-f-text">0g</span>
+                        </div>
+                        <div class="chart-value" id="dash-f-rem">0</div>
+                    </div>
+                    <div class="chart-container">
+                        <div class="chart-label">Agua</div>
+                        <div class="progress-circle" id="chart-water" style="--p: 0; --c: var(--secondary);">
+                            <span class="inner-text" id="dash-water-text">0L</span>
+                        </div>
+                        <div class="chart-value" id="dash-water-rem">0</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="dashboard-page" id="dashboard-page-bars">
+                <div class="macro-bar-row">
+                    <div class="macro-bar-top">
+                        <span class="macro-bar-label">Energía <span class="macro-bar-sub" id="bar-kcal-sub">- 0 / 0 kcal</span></span>
+                        <span class="macro-bar-remaining" id="bar-kcal-remaining">0 kcal</span>
+                    </div>
+                    <div class="macro-bar-track"><div class="macro-bar-fill" id="bar-kcal-fill" style="background: var(--primary);"></div></div>
+                </div>
+                <div class="macro-bar-row">
+                    <div class="macro-bar-top">
+                        <span class="macro-bar-label">Proteína <span class="macro-bar-sub" id="bar-p-sub">- 0 / 0 g</span></span>
+                        <span class="macro-bar-remaining" id="bar-p-remaining">0 g</span>
+                    </div>
+                    <div class="macro-bar-track"><div class="macro-bar-fill" id="bar-p-fill" style="background: #4caf50;"></div></div>
+                </div>
+                <div class="macro-bar-row">
+                    <div class="macro-bar-top">
+                        <span class="macro-bar-label">Carbohidratos <span class="macro-bar-sub" id="bar-c-sub">- 0 / 0 g</span></span>
+                        <span class="macro-bar-remaining" id="bar-c-remaining">0 g</span>
+                    </div>
+                    <div class="macro-bar-track"><div class="macro-bar-fill" id="bar-c-fill" style="background: #2196f3;"></div></div>
+                </div>
+                <div class="macro-bar-row">
+                    <div class="macro-bar-top">
+                        <span class="macro-bar-label">Grasa <span class="macro-bar-sub" id="bar-f-sub">- 0 / 0 g</span></span>
+                        <span class="macro-bar-remaining" id="bar-f-remaining">0 g</span>
+                    </div>
+                    <div class="macro-bar-track"><div class="macro-bar-fill" id="bar-f-fill" style="background: #ff9800;"></div></div>
+                </div>
+                <div class="macro-bar-row">
+                    <div class="macro-bar-top">
+                        <span class="macro-bar-label">Agua <span class="macro-bar-sub" id="bar-water-sub">- 0 / 0 L</span></span>
+                        <span class="macro-bar-remaining" id="bar-water-remaining">0 L</span>
+                    </div>
+                    <div class="macro-bar-track"><div class="macro-bar-fill" id="bar-water-fill" style="background: var(--secondary);"></div></div>
+                </div>
+            </div>
+            </div>
+
+            <div class="dashboard-nav">
+                <span class="dash-arrow" onclick="switchDashboardView(-1)">&#8249;</span>
+                <div class="dash-dots">
+                    <span class="dash-dot active" data-page="0" onclick="setDashboardView(0)"></span>
+                    <span class="dash-dot" data-page="1" onclick="setDashboardView(1)"></span>
+                </div>
+                <span class="dash-arrow" onclick="switchDashboardView(1)">&#8250;</span>
+            </div>
+        </div>
+
+        <!-- Meals Containers -->
+        <div id="meals-container"></div>
+    </div>
+
+    <!-- TAB 3: RECETAS -->
+    <div id="tab-recetas" class="tab-content">
+        <div class="card">
+            <div class="card-header">Mis Recetas Rápidas</div>
+            <div id="recipes-list-container"></div>
+        </div>
+    </div>
+
+    <!-- TAB 4: BASE DE DATOS -->
+    <div id="tab-db" class="tab-content">
+        <!-- Calculadora de Receta -->
+        <div class="card">
+            <div class="card-header collapsible-header" onclick="toggleCalc()">
+                Calculadora de Receta 
+                <span id="calc-icon">▼</span>
+            </div>
+            <div class="collapsible-content" id="calc-content">
+                <p style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 10px;">Añade ingredientes para obtener los macros por cada 100g de la receta y guardarla en la BD.</p>
+                
+                <div class="row">
+                    <div class="input-group" style="flex: 2;">
+                        <input type="text" id="calc-food-input" class="food-autocomplete-input" autocomplete="off" placeholder="Alimento" onkeydown="handleCalcAddKeyDown(event)">
+                    </div>
+                    <div class="input-group" style="flex: 1;">
+                        <input type="number" id="calc-qty-input" placeholder="g" onkeydown="handleCalcAddKeyDown(event)">
+                    </div>
+                </div>
+                <button class="btn secondary small" onclick="addIngredientToCalc()" style="margin-bottom: 15px; width: 100%;">Agregar Ingrediente</button>
+                
+                <table id="calc-table">
+                    <thead>
+                        <tr>
+                            <th>Alimento</th>
+                            <th>g</th>
+                            <th>P</th>
+                            <th>C</th>
+                            <th>G</th>
+                        </tr>
+                    </thead>
+                    <tbody id="calc-tbody"></tbody>
+                    <tfoot id="calc-tfoot">
+                        <tr class="summary-row" id="calc-total-row">
+                            <td>Total</td>
+                            <td id="calc-total-g">0</td>
+                            <td id="calc-total-p">0</td>
+                            <td id="calc-total-c">0</td>
+                            <td id="calc-total-f">0</td>
+                        </tr>
+                        <tr class="summary-row" style="color: var(--secondary);">
+                            <td>Por 100g</td>
+                            <td>100</td>
+                            <td id="calc-100-p">0</td>
+                            <td id="calc-100-c">0</td>
+                            <td id="calc-100-f">0</td>
+                        </tr>
+                    </tfoot>
+                </table>
+
+                <div class="input-group" style="margin-top: 15px;">
+                    <input type="text" id="calc-recipe-name" placeholder="Nombre para guardar en BD">
+                </div>
+                <button class="btn small" onclick="saveCalcToDB()">Guardar en BD</button>
+                <button class="btn secondary small" onclick="saveCalcToRecipes()" style="margin-top: 10px;">Guardar en "Mis Recetas Rápidas"</button>
+                <button class="btn danger small" onclick="clearCalc()" style="margin-top: 10px;">Limpiar Calculadora</button>
+            </div>
+        </div>
+
+        <!-- Base de Datos -->
+        <div class="card">
+            <div class="card-header">Base de Datos</div>
+            <div class="row" style="margin-bottom: 15px;">
+                <button class="btn small" onclick="openAddFoodModal()">+ Nuevo Alimento</button>
+                <button class="btn small secondary" onclick="openEditFoodModal()">Editar Alimento</button>
+            </div>
+            <div class="input-group">
+                <input type="text" id="db-search" placeholder="Buscar alimento..." onkeyup="renderDB()">
+            </div>
+            
+            <table id="db-table">
+                <thead>
+                    <tr>
+                        <th>Alimento</th>
+                        <th>P</th>
+                        <th>C</th>
+                        <th>G</th>
+                    </tr>
+                </thead>
+                <tbody id="db-tbody"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Modals -->
+    <div id="new-db-food-modal" class="modal">
+        <div class="modal-content">
+            <h3 style="margin-bottom: 15px;">Nuevo Alimento (Macros por 100g)</h3>
+            <div class="input-group">
+                <label>Nombre</label>
+                <input type="text" id="new-db-name">
+            </div>
+            <div class="row">
+                <div class="input-group">
+                    <label>Proteína</label>
+                    <input type="number" id="new-db-p">
+                </div>
+                <div class="input-group">
+                    <label>Carbos</label>
+                    <input type="number" id="new-db-c">
+                </div>
+                <div class="input-group">
+                    <label>Grasas</label>
+                    <input type="number" id="new-db-f">
+                </div>
+            </div>
+            <div class="row" style="margin-top: 20px;">
+                <button class="btn secondary" onclick="closeModal('new-db-food-modal')">Cancelar</button>
+                <button class="btn" onclick="saveNewDBFood()">Guardar</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="edit-db-food-modal" class="modal">
+        <div class="modal-content">
+            <h3 style="margin-bottom: 15px;">Editar Alimento</h3>
+            <div class="input-group">
+                <label>Buscar Alimento</label>
+                <input type="text" id="edit-db-search-input" class="food-autocomplete-input" autocomplete="off" placeholder="Escribe o selecciona un alimento">
+            </div>
+            <div id="edit-db-fields" style="display: none;">
+                <div class="row">
+                    <div class="input-group">
+                        <label>Proteína</label>
+                        <input type="number" id="edit-db-p">
+                    </div>
+                    <div class="input-group">
+                        <label>Carbos</label>
+                        <input type="number" id="edit-db-c">
+                    </div>
+                    <div class="input-group">
+                        <label>Grasas</label>
+                        <input type="number" id="edit-db-f">
+                    </div>
+                </div>
+                <div class="row" style="margin-top: 10px;">
+                    <button class="btn danger icon-btn" onclick="deleteDBFood()">
+                        <svg viewBox="0 0 24 24" style="width:18px;height:18px;fill:currentColor;"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
+                        Eliminar
+                    </button>
+                    <button class="btn" onclick="updateDBFood()">Guardar Cambios</button>
+                </div>
+            </div>
+            <div class="row" style="margin-top: 20px;">
+                <button class="btn secondary" onclick="closeModal('edit-db-food-modal')">Cerrar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Custom autocomplete dropdown (shared, replaces native <datalist>) -->
+    <div id="autocomplete-dropdown" class="autocomplete-dropdown"></div>
+
+    <!-- Bottom Navigation -->
+    <nav>
+        <div class="nav-item" onclick="switchTab('tab-macros', this)">
+            <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 9h-2V7h-2v5H6v2h2v5h2v-5h2v-2z"/></svg>
+            Macros
+        </div>
+        <div class="nav-item active" onclick="switchTab('tab-ingesta', this)">
+            <svg viewBox="0 0 24 24"><path d="M11 9H9V2H7v7H5V2H3v7c0 2.12 1.66 3.86 3.75 3.97V22h2.5v-9.03C11.34 12.86 13 11.12 13 9V2h-2v7zm5-4v7h2.5v8H21V2c-2.76 0-5 2.24-5 5z"/></svg>
+            Ingesta
+        </div>
+        <div class="nav-item" onclick="switchTab('tab-recetas', this)">
+            <svg viewBox="0 0 24 24"><path d="M18 11V4h-2v7h-4V4h-2v7H6V4H4v7c0 2.21 1.79 4 4 4v7h2v-7h2v7h2v-7c2.21 0 4-1.79 4-4z"/></svg>
+            Recetas
+        </div>
+        <div class="nav-item" onclick="switchTab('tab-db', this)">
+            <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z"/></svg>
+            Base Datos
+        </div>
+    </nav>
+
+    <script>
+        // --- DATA INITIALIZATION ---
+        
+        function calcKcal(p, c, f) {
+            return (p * 4) + (c * 4) + (f * 9);
+        }
+
+        // Updated Database directly from the image
+        const defaultDB = [
+            { name: "Plátano", p: 1.09, c: 22.84, f: 0.33 },
+            { name: "Manzana", p: 0.26, c: 13.81, f: 0.17 },
+            { name: "Piña", p: 0.54, c: 12.9, f: 0.12 },
+            { name: "Fresa", p: 0.67, c: 7.68, f: 0.3 },
+            { name: "Uva", p: 0.72, c: 18.1, f: 0.16 },
+            { name: "Mango", p: 0.82, c: 14.98, f: 0.38 },
+            { name: "Melón", p: 0.84, c: 8.16, f: 0.19 },
+            { name: "Papaya", p: 0.47, c: 10.82, f: 0.26 },
+            { name: "Aguacate", p: 2, c: 8.53, f: 14.66 },
+            { name: "Papa blanca", p: 1.87, c: 20.13, f: 0.1 },
+            { name: "Guayaba", p: 2.55, c: 14.32, f: 0.95 },
+            { name: "Sandía", p: 0.61, c: 7.55, f: 0.15 },
+            { name: "Zanahoria", p: 0.93, c: 9.58, f: 0.24 },
+            { name: "Jícama", p: 0.72, c: 8.82, f: 0.09 },
+            { name: "Calabaza", p: 1.1, c: 6.5, f: 0.1 },
+            { name: "Calabacín", p: 1.21, c: 3.11, f: 0.32 },
+            { name: "Elote", p: 3.27, c: 18.7, f: 1.35 },
+            { name: "Chícharo", p: 5.42, c: 14.46, f: 0.4 },
+            { name: "Miel", p: 0.3, c: 82.4, f: 0 },
+            { name: "Avena", p: 13.5, c: 66, f: 6.9 },
+            { name: "Caldo de jitomate", p: 0.9, c: 3.8, f: 0.2 },
+            { name: "Arroz", p: 2.69, c: 28.17, f: 1.28 },
+            { name: "Pan cero cero", p: 10.7, c: 37.4, f: 1.2 },
+            { name: "Bolillo", p: 8, c: 58, f: 1.5 },
+            { name: "Tostadas salmas", p: 40, c: 420, f: 30 },
+            { name: "Galleta arroz y quinoa", p: 50, c: 600, f: 0 },
+            { name: "Galleta María", p: 6.7, c: 79.1, f: 7.3 },
+            { name: "Tortilla maíz", p: 5.7, c: 45, f: 2.8 },
+            { name: "Tortilla nopal", p: 4.5, c: 32, f: 1 },
+            { name: "Azúcar", p: 0, c: 100, f: 0 },
+            { name: "Monk fruit", p: 0, c: 8, f: 0 },
+            { name: "Pollo", p: 32.1, c: 0, f: 3.24 },
+            { name: "Atún", p: 23.6, c: 0, f: 1 },
+            { name: "Bistec", p: 26, c: 0, f: 8.5 },
+            { name: "Arrachera", p: 26, c: 0, f: 12 },
+            { name: "New York", p: 23, c: 0, f: 5.5 },
+            { name: "Chuleta", p: 22, c: 0, f: 7 },
+            { name: "Espinazo", p: 20.5, c: 0, f: 8.5 },
+            { name: "Falda de res", p: 21.5, c: 0, f: 4.5 },
+            { name: "Tilapia", p: 20.1, c: 0, f: 1.7 },
+            { name: "Jamón pavo", p: 15.5, c: 8, f: 0.9 },
+            { name: "Jamón cerdo", p: 17, c: 3, f: 2 },
+            { name: "Leche", p: 3.12, c: 4.8, f: 1 },
+            { name: "Clara de huevo", p: 10.9, c: 0.7, f: 0.17 },
+            { name: "Queso cottage", p: 10, c: 1, f: 3 },
+            { name: "Caldo de pollo", p: 0.4, c: 0, f: 0.2 },
+            { name: "Yogur Griego", p: 6, c: 7, f: 1.1 },
+            { name: "Huevo", p: 12.58, c: 1.12, f: 10.61 },
+            { name: "Queso parmesano", p: 35, c: 3, f: 25 },
+            { name: "Yema de huevo", p: 15.86, c: 3.59, f: 26.54 },
+            { name: "Pepitas", p: 30.23, c: 10.71, f: 49.05 },
+            { name: "Almendras", p: 21.15, c: 21.55, f: 49.93 },
+            { name: "Aceite de oliva", p: 0, c: 0, f: 100 },
+            { name: "Mantequilla", p: 0.85, c: 0.06, f: 81.11 },
+            { name: "Cacao", p: 19.6, c: 57.9, f: 13.7 },
+            { name: "Brownie", p: 6.58, c: 16.46, f: 3.63 },
+            { name: "Crema de cacao", p: 4.27, c: 20.92, f: 8.47 },
+            { name: "Gelatina", p: 1.5, c: 0, f: 0 },
+            { name: "Vainilla", p: 0.06, c: 12.65, f: 0.06 },
+            { name: "Ensalada", p: 1.35, c: 2.9, f: 0.15 },
+            { name: "Lechuga", p: 1.35, c: 2.9, f: 0.15 },
+            { name: "Espinaca", p: 2.86, c: 3.63, f: 0.39 },
+            { name: "Brócoli", p: 2.38, c: 7.18, f: 0.41 },
+            { name: "Nopal", p: 1.45, c: 3.33, f: 0.15 },
+            { name: "Chile poblano", p: 1.5, c: 4.68, f: 0.2 },
+            { name: "Cebolla", p: 1.1, c: 9.34, f: 0.1 },
+            { name: "Cebolla asada", p: 1.4, c: 10.15, f: 0.19 },
+            { name: "Jitomate", p: 0.85, c: 3.89, f: 0.2 },
+            { name: "Pepino", p: 0.65, c: 3.63, f: 0.11 }
+        ];
+
+        let mealSections = JSON.parse(localStorage.getItem('macros_meal_sections')) || ["Desayuno", "Comida", "Pre entreno", "Comida 2", "Cena"];
+
+        // State
+        let db = JSON.parse(localStorage.getItem('macros_db')) || defaultDB;
+        let targets = JSON.parse(localStorage.getItem('macros_targets')) || { p: 125, c: 285, f: 40, water: 3 };
+        if (targets.water === undefined || targets.water === null) targets.water = 3;
+        let ingesta = JSON.parse(localStorage.getItem('macros_ingesta')) || {
+            "Desayuno": [], "Comida": [], "Pre entreno": [], "Comida 2": [], "Cena": []
+        };
+        let recetas = JSON.parse(localStorage.getItem('macros_recipes')) || [];
+        let agua = parseFloat(localStorage.getItem('macros_agua')) || 0;
+        let dashboardViewIndex = parseInt(localStorage.getItem('macros_dashboard_view')) || 0;
+        
+        let calcIngredients = [];
+
+        // Tracks which meal sections are collapsed (in-memory, survives re-renders)
+        let mealCollapsedState = {};
+        let aguaCollapsedState = false;
+
+        // --- UTILS ---
+        
+        function formatNum(num) {
+            return parseFloat(num).toFixed(2);
+        }
+
+        function getFoodFromDB(name) {
+            return db.find(f => f.name.toLowerCase() === name.toLowerCase());
+        }
+
+        // Classifies a food by its dominant macro (by % of calories):
+        // 1 = Proteína (>50% kcal de proteína), 2 = Carbohidratos (>50% kcal de carbos),
+        // 3 = Grasas (>50% kcal de grasa), 4 = Balanceado (ninguno supera el 50%)
+        function classifyFood(item) {
+            const pCal = (item.p || 0) * 4;
+            const cCal = (item.c || 0) * 4;
+            const fCal = (item.f || 0) * 9;
+            const total = pCal + cCal + fCal;
+
+            if (total <= 0) return 4;
+            if (pCal / total > 0.5) return 1;
+            if (cCal / total > 0.5) return 2;
+            if (fCal / total > 0.5) return 3;
+            return 4;
+        }
+
+        const dbGroupLabels = { 1: 'Fuentes de Proteína', 2: 'Fuentes de Carbohidratos', 3: 'Fuentes de Grasas', 4: 'Balanceados' };
+
+        function computeItemMacros(item) {
+            const factor = (item.qty || 0) / 100;
+            const foodBD = getFoodFromDB(item.name);
+            let p = 0, c = 0, f = 0;
+            if (foodBD) {
+                p = foodBD.p * factor;
+                c = foodBD.c * factor;
+                f = foodBD.f * factor;
+            }
+            return { p, c, f, kcal: calcKcal(p, c, f) };
+        }
+
+        // --- TAB SWITCHING ---
+        function switchTab(tabId, navElement) {
+            hideAutocomplete();
+
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            if(navElement) navElement.classList.add('active');
+
+            if (tabId === 'tab-ingesta') renderIngesta();
+            if (tabId === 'tab-macros') { renderTargets(); renderMealSectionsEditor(); }
+            if (tabId === 'tab-db') renderDB();
+            if (tabId === 'tab-recetas') renderRecetas();
+        }
+
+        // --- TAB 1: MACROS ---
+        function renderTargets() {
+            document.getElementById('target-p').value = targets.p;
+            document.getElementById('target-c').value = targets.c;
+            document.getElementById('target-f').value = targets.f;
+            document.getElementById('target-water').value = targets.water;
+            updateTargetKcalDisplay();
+        }
+
+        function updateTargetKcalDisplay() {
+            const p = parseFloat(document.getElementById('target-p').value) || 0;
+            const c = parseFloat(document.getElementById('target-c').value) || 0;
+            const f = parseFloat(document.getElementById('target-f').value) || 0;
+            document.getElementById('target-kcal-display').innerText = formatNum(calcKcal(p, c, f));
+        }
+
+        document.getElementById('target-p').addEventListener('input', updateTargetKcalDisplay);
+        document.getElementById('target-c').addEventListener('input', updateTargetKcalDisplay);
+        document.getElementById('target-f').addEventListener('input', updateTargetKcalDisplay);
+
+        function saveTargets() {
+            targets.p = parseFloat(document.getElementById('target-p').value) || 0;
+            targets.c = parseFloat(document.getElementById('target-c').value) || 0;
+            targets.f = parseFloat(document.getElementById('target-f').value) || 0;
+            targets.water = parseFloat(document.getElementById('target-water').value) || 0;
+            localStorage.setItem('macros_targets', JSON.stringify(targets));
+            alert("Objetivos guardados");
+            renderIngesta();
+        }
+
+        // --- TAB 1b: SECCIONES DE COMIDAS ---
+        function saveMealSections() {
+            localStorage.setItem('macros_meal_sections', JSON.stringify(mealSections));
+        }
+
+        function renderMealSectionsEditor() {
+            const container = document.getElementById('meal-sections-list');
+            container.innerHTML = '';
+            mealSections.forEach((name) => addMealSectionRow(name, name));
+        }
+
+        function addMealSectionRow(name, originalName) {
+            const container = document.getElementById('meal-sections-list');
+            const row = document.createElement('div');
+            row.className = 'food-item-row';
+            if (originalName !== undefined) row.dataset.originalName = originalName;
+
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.className = 'section-name-input';
+            input.placeholder = 'Nombre de sección';
+            input.value = name || '';
+
+            const del = document.createElement('div');
+            del.className = 'food-delete';
+            del.title = 'Eliminar sección';
+            del.innerText = '×';
+            del.onclick = () => row.remove();
+
+            row.appendChild(input);
+            row.appendChild(del);
+            container.appendChild(row);
+        }
+
+        function addMealSectionField() {
+            addMealSectionRow('', undefined);
+        }
+
+        function saveMealSectionsFromUI() {
+            const rows = document.querySelectorAll('#meal-sections-list .food-item-row');
+            const entries = Array.from(rows).map(row => ({
+                newName: row.querySelector('.section-name-input').value.trim(),
+                originalName: row.dataset.originalName || null
+            })).filter(e => e.newName.length > 0);
+
+            if (entries.length === 0) {
+                alert("Debe haber al menos una sección.");
+                return;
+            }
+
+            const lowerNames = entries.map(e => e.newName.toLowerCase());
+            if (new Set(lowerNames).size !== lowerNames.length) {
+                alert("No puede haber nombres de sección repetidos.");
+                return;
+            }
+
+            const keptOriginals = new Set(entries.map(e => e.originalName).filter(Boolean));
+            const removedWithData = mealSections.filter(name => !keptOriginals.has(name) && ingesta[name] && ingesta[name].length > 0);
+
+            if (removedWithData.length > 0) {
+                if (!confirm(`Se eliminarán los alimentos registrados de: ${removedWithData.join(', ')}. ¿Continuar?`)) {
+                    return;
+                }
+            }
+
+            const newIngesta = {};
+            entries.forEach(e => {
+                if (e.originalName && ingesta[e.originalName]) {
+                    newIngesta[e.newName] = ingesta[e.originalName];
+                } else {
+                    newIngesta[e.newName] = newIngesta[e.newName] || [];
+                }
+            });
+
+            mealSections = entries.map(e => e.newName);
+            ingesta = newIngesta;
+            mealCollapsedState = {};
+
+            saveMealSections();
+            saveIngesta();
+
+            alert("Secciones actualizadas.");
+            renderMealSectionsEditor();
+        }
+
+        // --- TAB 2: INGESTA (FAST LOGGING) ---
+        function renderIngesta() {
+            const container = document.getElementById('meals-container');
+            container.innerHTML = '';
+
+            let totalP = 0, totalC = 0, totalF = 0;
+
+            mealSections.forEach((meal, mealIdx) => {
+                if(!ingesta[meal]) ingesta[meal] = [];
+                
+                let mealP = 0, mealC = 0, mealF = 0, mealKcal = 0;
+
+                let foodRowsHTML = '';
+                ingesta[meal].forEach((item, itemIdx) => {
+                    const { p, c, f, kcal } = computeItemMacros(item);
+
+                    item.p = p; item.c = c; item.f = f; item.kcal = kcal;
+
+                    mealP += p; mealC += c; mealF += f; mealKcal += kcal;
+                    totalP += p; totalC += c; totalF += f;
+
+                    foodRowsHTML += `
+                        <div class="food-item-row">
+                            <div class="food-item-info">
+                                <span class="food-item-name">${item.name}</span>
+                                <span class="food-item-macros" id="itemmacros-${mealIdx}-${itemIdx}">P: ${formatNum(p)} | C: ${formatNum(c)} | G: ${formatNum(f)} | ${formatNum(kcal)} kcal</span>
+                            </div>
+                            <input type="number" 
+                                   class="food-item-qty-input qty-input-field" 
+                                   value="${item.qty === 0 ? '' : item.qty}" 
+                                   placeholder="0g" 
+                                   data-meal="${meal}" 
+                                   data-index="${itemIdx}"
+                                   onchange="updateItemQtySilent('${meal}', ${itemIdx}, this.value)"
+                                   onkeydown="handleQtyKeyDown(event, '${meal}', ${itemIdx})">
+                            <div class="food-delete" onclick="deleteFood('${meal}', ${itemIdx})">×</div>
+                        </div>
+                    `;
+                });
+
+                const isCollapsed = !!mealCollapsedState[meal];
+
+                container.innerHTML += `
+                    <div class="card">
+                        <div class="card-header collapsible-header" onclick="toggleMeal(${mealIdx})">
+                            <span>${meal}</span>
+                            <span style="display:flex; align-items:center; gap:10px;">
+                                <span style="font-size: 0.8rem; font-weight: normal; color: var(--primary)" id="mealkcalheader-${mealIdx}">
+                                    ${formatNum(mealKcal)} kcal
+                                </span>
+                                <span id="mealicon-${mealIdx}" style="font-size: 0.8rem;">${isCollapsed ? '▼' : '▲'}</span>
+                            </span>
+                        </div>
+
+                        <table style="margin-top: 10px; background: rgba(0,0,0,0.2); border-radius: 4px;">
+                            <tr class="summary-row">
+                                <td>Total ${meal}</td>
+                                <td id="mealtotal-p-${mealIdx}">P: ${formatNum(mealP)}</td>
+                                <td id="mealtotal-c-${mealIdx}">C: ${formatNum(mealC)}</td>
+                                <td id="mealtotal-f-${mealIdx}">G: ${formatNum(mealF)}</td>
+                            </tr>
+                        </table>
+
+                        <div class="collapsible-content ${isCollapsed ? '' : 'open'}" id="mealcontent-${mealIdx}">
+                            <div class="food-list">${foodRowsHTML}</div>
+                            
+                            <!-- Inline Add Box -->
+                            <div class="inline-add-box">
+                                <input type="text" 
+                                       id="inline-name-${mealIdx}" 
+                                       class="food-autocomplete-input"
+                                       autocomplete="off"
+                                       placeholder="+ Alimento..."
+                                       onkeydown="handleInlineAddNameKeyDown(event, '${meal}', ${mealIdx})">
+                                <input type="number" 
+                                       id="inline-qty-${mealIdx}" 
+                                       placeholder="g"
+                                       onkeydown="handleInlineAddQtyKeyDown(event, '${meal}', ${mealIdx})">
+                                <button class="btn small" style="width: auto; padding: 8px 12px;" onclick="addInlineFood('${meal}', ${mealIdx})">+</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            // Water tracking card, placed right after the last meal section (Cena)
+            const aguaCollapsed = aguaCollapsedState;
+            container.innerHTML += `
+                <div class="card">
+                    <div class="card-header collapsible-header" onclick="toggleAgua()">
+                        <span>Agua</span>
+                        <span style="display:flex; align-items:center; gap:10px;">
+                            <span class="water-header-value" id="agua-total-header">${formatNum(agua)} / ${formatNum(targets.water)} L</span>
+                            <span id="aguaicon" style="font-size: 0.8rem;">${aguaCollapsed ? '▼' : '▲'}</span>
+                        </span>
+                    </div>
+                    <div class="collapsible-content ${aguaCollapsed ? '' : 'open'}" id="aguacontent">
+                        <div class="water-input-row">
+                            <input type="number" id="agua-input" placeholder="Cantidad en L (ej. 0.5)" step="0.1" onkeydown="handleAguaKeyDown(event)">
+                            <button class="btn small" style="width: auto; padding: 10px 18px;" onclick="addAgua()">+</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            updateDashboard(totalP, totalC, totalF, true);
+            setDashboardView(dashboardViewIndex);
+        }
+
+        // Animates a collapsible-content element open or closed by transitioning
+        // its actual pixel height (display:none can't be transitioned directly).
+        function animateCollapse(el, opening) {
+            if (!el) return;
+            el.style.transition = 'none';
+
+            if (opening) {
+                el.classList.add('open');
+                const target = el.scrollHeight;
+                el.style.height = '0px';
+                el.style.opacity = '0';
+                void el.offsetHeight; // force reflow
+                el.style.transition = 'height 0.22s ease, opacity 0.2s ease';
+                requestAnimationFrame(() => {
+                    el.style.height = target + 'px';
+                    el.style.opacity = '1';
+                });
+                const onEnd = (e) => {
+                    if (e.propertyName === 'height') {
+                        el.style.height = 'auto';
+                        el.removeEventListener('transitionend', onEnd);
+                    }
+                };
+                el.addEventListener('transitionend', onEnd);
+            } else {
+                const current = el.scrollHeight;
+                el.style.height = current + 'px';
+                void el.offsetHeight; // force reflow
+                el.style.transition = 'height 0.22s ease, opacity 0.2s ease';
+                requestAnimationFrame(() => {
+                    el.style.height = '0px';
+                    el.style.opacity = '0';
+                });
+                el.classList.remove('open');
+            }
+        }
+
+        // Collapsible meal sections (mirrors the "Calculadora de Receta" pattern)
+        function toggleMeal(mealIdx) {
+            const meal = mealSections[mealIdx];
+            const content = document.getElementById(`mealcontent-${mealIdx}`);
+            const icon = document.getElementById(`mealicon-${mealIdx}`);
+            const isOpening = !content.classList.contains('open');
+
+            animateCollapse(content, isOpening);
+            icon.innerText = isOpening ? '▲' : '▼';
+            mealCollapsedState[meal] = !isOpening;
+        }
+
+        // Collapsible water tracking section
+        function toggleAgua() {
+            const content = document.getElementById('aguacontent');
+            const icon = document.getElementById('aguaicon');
+            const isOpening = !content.classList.contains('open');
+
+            animateCollapse(content, isOpening);
+            icon.innerText = isOpening ? '▲' : '▼';
+            aguaCollapsedState = !isOpening;
+        }
+
+        // Inline Add Logic
+        function addInlineFood(meal, mealIdx) {
+            const nameInput = document.getElementById(`inline-name-${mealIdx}`);
+            const qtyInput = document.getElementById(`inline-qty-${mealIdx}`);
+            
+            const name = nameInput.value.trim();
+            const qty = parseFloat(qtyInput.value) || 0; // default 0 if blank
+
+            if (!name) return;
+
+            ingesta[meal].push({
+                name: name,
+                qty: qty,
+                p: 0, c: 0, f: 0, kcal: 0
+            });
+
+            saveIngesta();
+            hideAutocomplete();
+            nameInput.value = '';
+            qtyInput.value = '';
+            renderIngesta();
+            
+            // Re-focus name input for fast sequential adding
+            const nextNameInput = document.getElementById(`inline-name-${mealIdx}`);
+            if (nextNameInput) nextNameInput.focus();
+        }
+
+        function handleInlineAddNameKeyDown(e, meal, mealIdx) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                addInlineFood(meal, mealIdx);
+            }
+        }
+
+        function handleInlineAddQtyKeyDown(e, meal, mealIdx) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                addInlineFood(meal, mealIdx);
+            }
+        }
+
+        // Silently updates one item's quantity + macros without destroying/re-rendering
+        // the whole meal list, so focus (and the mobile keyboard) is preserved.
+        function updateItemQtySilent(meal, index, val) {
+            const item = ingesta[meal][index];
+            if (!item) return;
+
+            item.qty = parseFloat(val) || 0;
+            const { p, c, f, kcal } = computeItemMacros(item);
+            item.p = p; item.c = c; item.f = f; item.kcal = kcal;
+            saveIngesta();
+
+            const mealIdx = mealSections.indexOf(meal);
+            const macroEl = document.getElementById(`itemmacros-${mealIdx}-${index}`);
+            if (macroEl) {
+                macroEl.innerText = `P: ${formatNum(p)} | C: ${formatNum(c)} | G: ${formatNum(f)} | ${formatNum(kcal)} kcal`;
+            }
+
+            updateMealTotals(meal);
+            updateGrandTotals();
+        }
+
+        function updateMealTotals(meal) {
+            const mealIdx = mealSections.indexOf(meal);
+            let mealP = 0, mealC = 0, mealF = 0, mealKcal = 0;
+            (ingesta[meal] || []).forEach(item => {
+                mealP += item.p || 0; mealC += item.c || 0; mealF += item.f || 0; mealKcal += item.kcal || 0;
+            });
+
+            const kcalEl = document.getElementById(`mealkcalheader-${mealIdx}`);
+            const pEl = document.getElementById(`mealtotal-p-${mealIdx}`);
+            const cEl = document.getElementById(`mealtotal-c-${mealIdx}`);
+            const fEl = document.getElementById(`mealtotal-f-${mealIdx}`);
+            if (kcalEl) kcalEl.innerText = formatNum(mealKcal) + ' kcal';
+            if (pEl) pEl.innerText = 'P: ' + formatNum(mealP);
+            if (cEl) cEl.innerText = 'C: ' + formatNum(mealC);
+            if (fEl) fEl.innerText = 'G: ' + formatNum(mealF);
+        }
+
+        function updateGrandTotals() {
+            let totalP = 0, totalC = 0, totalF = 0;
+            mealSections.forEach(meal => {
+                (ingesta[meal] || []).forEach(item => {
+                    totalP += item.p || 0; totalC += item.c || 0; totalF += item.f || 0;
+                });
+            });
+            updateDashboard(totalP, totalC, totalF, false);
+        }
+
+        function handleQtyKeyDown(e, meal, index) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                updateItemQtySilent(meal, index, e.target.value);
+
+                // Move focus synchronously (no setTimeout) so the mobile keyboard
+                // stays open and jumps straight to the next visible quantity field.
+                const allQtyInputs = Array.from(document.querySelectorAll('.qty-input-field'))
+                    .filter(el => el.offsetParent !== null); // skip inputs inside collapsed meals
+                const currentPos = allQtyInputs.indexOf(e.target);
+
+                if (currentPos >= 0 && currentPos + 1 < allQtyInputs.length) {
+                    const nextInput = allQtyInputs[currentPos + 1];
+                    nextInput.focus();
+                    nextInput.select();
+                } else {
+                    e.target.blur();
+                }
+            }
+        }
+
+        function updateDashboard(totP, totC, totF, animate) {
+            const totKcal = calcKcal(totP, totC, totF);
+            const targetKcal = calcKcal(targets.p, targets.c, targets.f);
+
+            updateChart('chart-kcal', 'dash-kcal-text', 'dash-kcal-rem', totKcal, targetKcal, '', animate);
+            updateChart('chart-p', 'dash-p-text', 'dash-p-rem', totP, targets.p, 'g', animate);
+            updateChart('chart-c', 'dash-c-text', 'dash-c-rem', totC, targets.c, 'g', animate);
+            updateChart('chart-f', 'dash-f-text', 'dash-f-rem', totF, targets.f, 'g', animate);
+            updateChart('chart-water', 'dash-water-text', 'dash-water-rem', agua, targets.water, 'L', animate);
+
+            updateBar('bar-kcal', totKcal, targetKcal, 'kcal', animate);
+            updateBar('bar-p', totP, targets.p, 'g', animate);
+            updateBar('bar-c', totC, targets.c, 'g', animate);
+            updateBar('bar-f', totF, targets.f, 'g', animate);
+            updateBar('bar-water', agua, targets.water, 'L', animate);
+        }
+
+        // Updates one row of the alternate bar-style dashboard view
+        function updateBar(id, current, target, unit, animate) {
+            const perc = target > 0 ? Math.min((current / target) * 100, 100) : 0;
+
+            const fillEl = document.getElementById(`${id}-fill`);
+            const subEl = document.getElementById(`${id}-sub`);
+            const remEl = document.getElementById(`${id}-remaining`);
+
+            if (fillEl) {
+                if (animate) {
+                    fillEl.style.transition = 'none';
+                    fillEl.style.width = '0%';
+                    void fillEl.offsetWidth; // force reflow
+                    fillEl.style.transition = 'width 0.6s ease';
+                    requestAnimationFrame(() => {
+                        fillEl.style.width = perc + '%';
+                    });
+                } else {
+                    fillEl.style.width = perc + '%';
+                }
+            }
+            if (subEl) subEl.innerText = `- ${formatNum(current)} / ${formatNum(target)} ${unit}`;
+
+            const remaining = target - current;
+            if (remEl) {
+                remEl.innerText = `${formatNum(remaining)} ${unit}`;
+
+                remEl.className = 'macro-bar-remaining';
+                let threshold = id === 'bar-kcal' ? -45 : -5;
+
+                if (remaining >= 0) {
+                    remEl.classList.add('status-green');
+                } else if (remaining >= threshold) {
+                    remEl.classList.add('status-yellow');
+                } else {
+                    remEl.classList.add('status-red');
+                }
+            }
+        }
+
+        // --- DASHBOARD CAROUSEL (circular <-> bar view) ---
+        // Slides the newly-shown page in horizontally. forceDirection: 1 = enter
+        // from the right (moving forward), -1 = enter from the left (moving
+        // backward). If omitted, the direction is inferred from the index change
+        // (used by the dot buttons, which don't have an inherent direction).
+        function setDashboardView(idx, forceDirection) {
+            const prevIdx = dashboardViewIndex;
+            dashboardViewIndex = idx;
+            localStorage.setItem('macros_dashboard_view', idx);
+
+            const circularPage = document.getElementById('dashboard-page-circular');
+            const barsPage = document.getElementById('dashboard-page-bars');
+            const pageMap = { 0: circularPage, 1: barsPage };
+
+            let dir = forceDirection;
+            if (dir === undefined) {
+                dir = idx > prevIdx ? 1 : (idx < prevIdx ? -1 : 0);
+            }
+
+            Object.keys(pageMap).forEach(key => {
+                const pageIdx = parseInt(key);
+                const page = pageMap[key];
+                page.classList.remove('slide-in-right', 'slide-in-left');
+
+                if (pageIdx === idx) {
+                    const isNewlyActive = pageIdx !== prevIdx;
+                    page.classList.add('active');
+                    if (isNewlyActive && dir !== 0) {
+                        void page.offsetWidth; // force reflow so the animation replays
+                        page.classList.add(dir === 1 ? 'slide-in-right' : 'slide-in-left');
+                    }
+                } else {
+                    page.classList.remove('active');
+                }
+            });
+
+            document.querySelectorAll('.dash-dot').forEach(d => {
+                d.classList.toggle('active', parseInt(d.dataset.page) === idx);
+            });
+        }
+
+        function switchDashboardView(direction) {
+            const newIdx = (dashboardViewIndex + direction + 2) % 2;
+            setDashboardView(newIdx, direction > 0 ? 1 : -1);
+        }
+
+        function updateChart(chartId, textId, remId, current, target, unit, animate) {
+            const perc = target > 0 ? Math.min((current / target) * 100, 100) : 0;
+
+            if (animate) {
+                animateChartPercent(chartId, perc);
+            } else {
+                document.getElementById(chartId).style.setProperty('--p', perc);
+            }
+            
+            // Displays quantity instead of percentage in center
+            document.getElementById(textId).innerText = Math.round(current) + unit;
+
+            const remaining = target - current;
+            const remEl = document.getElementById(remId);
+            remEl.innerHTML = `<strong>${formatNum(remaining)}</strong>`;
+            
+            remEl.className = 'chart-value';
+            let threshold = chartId === 'chart-kcal' ? -45 : -5;
+            
+            if (remaining >= 0) {
+                remEl.classList.add('status-green');
+            } else if (remaining >= threshold) {
+                remEl.classList.add('status-yellow');
+            } else {
+                remEl.classList.add('status-red');
+            }
+        }
+
+        // Animates a progress-circle's --p custom property from 0 up to its
+        // real value, used when the Ingesta tab is opened / fully re-rendered.
+        function animateChartPercent(chartId, targetPerc) {
+            const el = document.getElementById(chartId);
+            if (!el) return;
+
+            el.style.setProperty('--p', 0);
+            const duration = 650;
+            const start = performance.now();
+
+            function step(now) {
+                const elapsed = now - start;
+                const t = Math.min(elapsed / duration, 1);
+                const eased = 1 - Math.pow(1 - t, 3); // ease-out cubic
+                el.style.setProperty('--p', (eased * targetPerc).toFixed(2));
+                if (t < 1) requestAnimationFrame(step);
+            }
+            requestAnimationFrame(step);
+        }
+
+        function deleteFood(meal, index) {
+            ingesta[meal].splice(index, 1);
+            saveIngesta();
+            renderIngesta();
+        }
+
+        function saveIngesta() {
+            localStorage.setItem('macros_ingesta', JSON.stringify(ingesta));
+        }
+
+        function resetDay() {
+            if(confirm("¿Estás seguro de reiniciar todos los registros del día?")) {
+                mealSections.forEach(m => ingesta[m] = []);
+                saveIngesta();
+                agua = 0;
+                saveAgua();
+                renderIngesta();
+            }
+        }
+
+        // --- WATER TRACKING ---
+        function saveAgua() {
+            localStorage.setItem('macros_agua', JSON.stringify(agua));
+        }
+
+        function addAgua() {
+            const input = document.getElementById('agua-input');
+            const val = parseFloat(input.value);
+            if (!val || val <= 0) return;
+
+            agua += val;
+            saveAgua();
+            input.value = '';
+
+            const headerEl = document.getElementById('agua-total-header');
+            if (headerEl) headerEl.innerText = `${formatNum(agua)} / ${formatNum(targets.water)} L`;
+
+            updateGrandTotals();
+            input.focus();
+        }
+
+        function handleAguaKeyDown(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                addAgua();
+            }
+        }
+
+        // --- TAB 3: RECETAS ---
+        function renderRecetas() {
+            const container = document.getElementById('recipes-list-container');
+            container.innerHTML = '';
+            
+            if(recetas.length === 0) {
+                container.innerHTML = '<p style="color: var(--text-secondary); font-size: 0.9rem;">No hay recetas guardadas. Usa la calculadora en "Base Datos" para crear una.</p>';
+                return;
+            }
+
+            recetas.forEach((receta, rIndex) => {
+                let itemsHtml = receta.ingredients.map(i => `${i.qty}g ${i.name}`).join(', ');
+                
+                let selectHtml = `<select id="meal-select-${rIndex}" style="margin-bottom: 10px;">`;
+                mealSections.forEach(m => selectHtml += `<option value="${m}">${m}</option>`);
+                selectHtml += `</select>`;
+
+                container.innerHTML += `
+                    <div class="card" style="background: var(--surface-variant);">
+                        <div class="card-header">${receta.name}</div>
+                        <p style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 10px;">
+                            ${itemsHtml}
+                        </p>
+                        <table style="margin-bottom: 10px;">
+                            <tr class="summary-row">
+                                <td>Macros</td>
+                                <td>P: ${formatNum(receta.p)}</td>
+                                <td>C: ${formatNum(receta.c)}</td>
+                                <td>G: ${formatNum(receta.f)}</td>
+                            </tr>
+                        </table>
+                        <div class="row">
+                            <div style="flex: 2;">${selectHtml}</div>
+                            <div style="flex: 1;"><button class="btn small" onclick="addRecipeToIntake(${rIndex})">Añadir</button></div>
+                        </div>
+                        <button class="btn danger small" style="margin-top: 10px;" onclick="deleteRecipe(${rIndex})">Eliminar Receta</button>
+                    </div>
+                `;
+            });
+        }
+
+        function addRecipeToIntake(rIndex) {
+            const receta = recetas[rIndex];
+            const meal = document.getElementById(`meal-select-${rIndex}`).value;
+            
+            receta.ingredients.forEach(ing => {
+                ingesta[meal].push({...ing});
+            });
+            
+            saveIngesta();
+            alert("Receta añadida a " + meal);
+        }
+
+        function deleteRecipe(rIndex) {
+            recetas.splice(rIndex, 1);
+            localStorage.setItem('macros_recipes', JSON.stringify(recetas));
+            renderRecetas();
+        }
+
+        // --- TAB 4: BASE DE DATOS & CALCULADORA ---
+        function renderDB() {
+            const tbody = document.getElementById('db-tbody');
+            const search = document.getElementById('db-search').value.toLowerCase();
+            tbody.innerHTML = '';
+
+            const filtered = db.filter(item => item.name.toLowerCase().includes(search));
+
+            // Smart sort: proteins first, then carbs, then fats, then balanced.
+            // Within each group, alphabetical order.
+            filtered.sort((a, b) => {
+                const groupA = classifyFood(a);
+                const groupB = classifyFood(b);
+                if (groupA !== groupB) return groupA - groupB;
+                return a.name.localeCompare(b.name);
+            });
+
+            let currentGroup = null;
+            filtered.forEach(item => {
+                const group = classifyFood(item);
+                if (group !== currentGroup) {
+                    currentGroup = group;
+                    tbody.innerHTML += `
+                        <tr class="db-group-header">
+                            <td colspan="4">${dbGroupLabels[group]}</td>
+                        </tr>
+                    `;
+                }
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${item.name}</td>
+                        <td>${formatNum(item.p)}</td>
+                        <td>${formatNum(item.c)}</td>
+                        <td>${formatNum(item.f)}</td>
+                    </tr>
+                `;
+            });
+        }
+
+        function openAddFoodModal() {
+            document.getElementById('new-db-name').value = '';
+            document.getElementById('new-db-p').value = '';
+            document.getElementById('new-db-c').value = '';
+            document.getElementById('new-db-f').value = '';
+            document.getElementById('new-db-food-modal').classList.add('active');
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).classList.remove('active');
+        }
+
+        function saveNewDBFood() {
+            const name = document.getElementById('new-db-name').value;
+            const p = parseFloat(document.getElementById('new-db-p').value) || 0;
+            const c = parseFloat(document.getElementById('new-db-c').value) || 0;
+            const f = parseFloat(document.getElementById('new-db-f').value) || 0;
+
+            if(!name) return alert("Nombre requerido");
+
+            const existingIndex = db.findIndex(x => x.name.toLowerCase() === name.toLowerCase());
+            if (existingIndex >= 0) {
+                db[existingIndex] = { name, p, c, f };
+            } else {
+                db.push({ name, p, c, f });
+            }
+
+            localStorage.setItem('macros_db', JSON.stringify(db));
+            closeModal('new-db-food-modal');
+            renderDB();
+        }
+
+        // --- EDITAR / ELIMINAR ALIMENTO DE LA BD ---
+        let editDBSelectedOriginalName = null;
+
+        function openEditFoodModal() {
+            document.getElementById('edit-db-search-input').value = '';
+            document.getElementById('edit-db-fields').style.display = 'none';
+            editDBSelectedOriginalName = null;
+            document.getElementById('edit-db-food-modal').classList.add('active');
+        }
+
+        function tryLoadFoodForEdit(name) {
+            const fieldsDiv = document.getElementById('edit-db-fields');
+            const food = name ? getFoodFromDB(name) : null;
+
+            if (food) {
+                editDBSelectedOriginalName = food.name;
+                document.getElementById('edit-db-p').value = formatNum(food.p);
+                document.getElementById('edit-db-c').value = formatNum(food.c);
+                document.getElementById('edit-db-f').value = formatNum(food.f);
+                fieldsDiv.style.display = 'block';
+            } else {
+                editDBSelectedOriginalName = null;
+                fieldsDiv.style.display = 'none';
+            }
+        }
+
+        function updateDBFood() {
+            if (!editDBSelectedOriginalName) return;
+            const idx = db.findIndex(f => f.name.toLowerCase() === editDBSelectedOriginalName.toLowerCase());
+            if (idx < 0) return;
+
+            const p = parseFloat(document.getElementById('edit-db-p').value) || 0;
+            const c = parseFloat(document.getElementById('edit-db-c').value) || 0;
+            const f = parseFloat(document.getElementById('edit-db-f').value) || 0;
+
+            db[idx] = { name: db[idx].name, p, c, f };
+            localStorage.setItem('macros_db', JSON.stringify(db));
+            alert("Alimento actualizado");
+            closeModal('edit-db-food-modal');
+            renderDB();
+        }
+
+        function deleteDBFood() {
+            if (!editDBSelectedOriginalName) return;
+            if (!confirm(`¿Eliminar "${editDBSelectedOriginalName}" de la base de datos?`)) return;
+
+            const idx = db.findIndex(f => f.name.toLowerCase() === editDBSelectedOriginalName.toLowerCase());
+            if (idx < 0) return;
+
+            db.splice(idx, 1);
+            localStorage.setItem('macros_db', JSON.stringify(db));
+            closeModal('edit-db-food-modal');
+            renderDB();
+        }
+
+        document.getElementById('edit-db-search-input').addEventListener('input', function() {
+            tryLoadFoodForEdit(this.value.trim());
+        });
+
+        // Calculadora
+        function toggleCalc() {
+            const content = document.getElementById('calc-content');
+            const icon = document.getElementById('calc-icon');
+            const isOpening = !content.classList.contains('open');
+
+            animateCollapse(content, isOpening);
+            icon.innerText = isOpening ? '▲' : '▼';
+        }
+
+        function handleCalcAddKeyDown(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                addIngredientToCalc();
+            }
+        }
+
+        function addIngredientToCalc() {
+            const name = document.getElementById('calc-food-input').value;
+            const qty = parseFloat(document.getElementById('calc-qty-input').value);
+
+            if(!name || !qty) return;
+            const food = getFoodFromDB(name);
+            if(!food) return alert("Alimento no encontrado en BD. Añádelo primero.");
+
+            const factor = qty / 100;
+            calcIngredients.push({
+                name, 
+                qty,
+                p: food.p * factor,
+                c: food.c * factor,
+                f: food.f * factor,
+                kcal: calcKcal(food.p * factor, food.c * factor, food.f * factor)
+            });
+
+            document.getElementById('calc-food-input').value = '';
+            document.getElementById('calc-qty-input').value = '';
+            hideAutocomplete();
+            renderCalc();
+        }
+
+        function renderCalc() {
+            const tbody = document.getElementById('calc-tbody');
+            tbody.innerHTML = '';
+            let tG=0, tP=0, tC=0, tF=0;
+
+            calcIngredients.forEach(item => {
+                tG += item.qty; tP += item.p; tC += item.c; tF += item.f;
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${item.name}</td>
+                        <td>${item.qty}</td>
+                        <td>${formatNum(item.p)}</td>
+                        <td>${formatNum(item.c)}</td>
+                        <td>${formatNum(item.f)}</td>
+                    </tr>
+                `;
+            });
+
+            document.getElementById('calc-total-g').innerText = formatNum(tG);
+            document.getElementById('calc-total-p').innerText = formatNum(tP);
+            document.getElementById('calc-total-c').innerText = formatNum(tC);
+            document.getElementById('calc-total-f').innerText = formatNum(tF);
+
+            if (tG > 0) {
+                const factor100 = 100 / tG;
+                document.getElementById('calc-100-p').innerText = formatNum(tP * factor100);
+                document.getElementById('calc-100-c').innerText = formatNum(tC * factor100);
+                document.getElementById('calc-100-f').innerText = formatNum(tF * factor100);
+            } else {
+                document.getElementById('calc-100-p').innerText = 0;
+                document.getElementById('calc-100-c').innerText = 0;
+                document.getElementById('calc-100-f').innerText = 0;
+            }
+        }
+
+        function clearCalc() {
+            calcIngredients = [];
+            document.getElementById('calc-recipe-name').value = '';
+            renderCalc();
+        }
+
+        function saveCalcToDB() {
+            const name = document.getElementById('calc-recipe-name').value;
+            if(!name || calcIngredients.length === 0) return alert("Falta nombre o ingredientes");
+            
+            const tG = calcIngredients.reduce((s, i) => s + i.qty, 0);
+            const factor100 = 100 / tG;
+            
+            const p100 = calcIngredients.reduce((s, i) => s + i.p, 0) * factor100;
+            const c100 = calcIngredients.reduce((s, i) => s + i.c, 0) * factor100;
+            const f100 = calcIngredients.reduce((s, i) => s + i.f, 0) * factor100;
+
+            db.push({ name: name, p: p100, c: c100, f: f100 });
+            localStorage.setItem('macros_db', JSON.stringify(db));
+            alert("Receta guardada como alimento en BD.");
+            renderDB();
+        }
+
+        function saveCalcToRecipes() {
+            const name = document.getElementById('calc-recipe-name').value;
+            if(!name || calcIngredients.length === 0) return alert("Falta nombre o ingredientes");
+            
+            const tP = calcIngredients.reduce((s, i) => s + i.p, 0);
+            const tC = calcIngredients.reduce((s, i) => s + i.c, 0);
+            const tF = calcIngredients.reduce((s, i) => s + i.f, 0);
+
+            recetas.push({
+                name: name,
+                ingredients: [...calcIngredients],
+                p: tP,
+                c: tC,
+                f: tF
+            });
+            localStorage.setItem('macros_recipes', JSON.stringify(recetas));
+            alert("Receta rápida guardada.");
+        }
+
+        // --- CUSTOM AUTOCOMPLETE (replaces native <datalist>, which on mobile
+        // opens a full-screen suggestion panel that covers the keyboard) ---
+        let autocompleteActiveInput = null;
+
+        function getViewportHeight() {
+            return window.visualViewport ? window.visualViewport.height : window.innerHeight;
+        }
+
+        function showAutocomplete(input) {
+            const dropdown = document.getElementById('autocomplete-dropdown');
+            const query = input.value.trim().toLowerCase();
+
+            const matches = (query ? db.filter(f => f.name.toLowerCase().includes(query)) : db).slice(0, 30);
+
+            if (matches.length === 0) {
+                hideAutocomplete();
+                return;
+            }
+
+            dropdown.innerHTML = matches.map(f =>
+                `<div class="autocomplete-item" data-name="${f.name.replace(/"/g, '&quot;')}">${f.name}</div>`
+            ).join('');
+
+            autocompleteActiveInput = input;
+            positionDropdown(input);
+            dropdown.classList.add('active');
+        }
+
+        function positionDropdown(input) {
+            const dropdown = document.getElementById('autocomplete-dropdown');
+            const rect = input.getBoundingClientRect();
+            const vh = getViewportHeight();
+            const spaceBelow = vh - rect.bottom;
+            const spaceAbove = rect.top;
+
+            dropdown.style.left = rect.left + 'px';
+            dropdown.style.width = rect.width + 'px';
+
+            // Prefer showing below the field, but flip above (or shrink) so the
+            // list never grows over the on-screen keyboard.
+            if (spaceBelow >= 120 || spaceBelow >= spaceAbove) {
+                dropdown.style.top = (rect.bottom + 4) + 'px';
+                dropdown.style.bottom = 'auto';
+                dropdown.style.maxHeight = Math.max(80, Math.min(160, spaceBelow - 12)) + 'px';
+            } else {
+                dropdown.style.bottom = (vh - rect.top + 4) + 'px';
+                dropdown.style.top = 'auto';
+                dropdown.style.maxHeight = Math.max(80, Math.min(160, spaceAbove - 12)) + 'px';
+            }
+        }
+
+        function hideAutocomplete() {
+            const dropdown = document.getElementById('autocomplete-dropdown');
+            dropdown.classList.remove('active');
+            autocompleteActiveInput = null;
+        }
+
+        function setupAutocomplete() {
+            document.addEventListener('input', (e) => {
+                if (e.target.classList && e.target.classList.contains('food-autocomplete-input')) {
+                    showAutocomplete(e.target);
+                }
+            });
+
+            document.addEventListener('focus', (e) => {
+                if (e.target.classList && e.target.classList.contains('food-autocomplete-input')) {
+                    showAutocomplete(e.target);
+                }
+            }, true);
+
+            // Prevent the input from blurring when a suggestion is tapped,
+            // so the keyboard doesn't flicker closed/open on mobile.
+            document.addEventListener('mousedown', (e) => {
+                if (e.target.closest('#autocomplete-dropdown')) {
+                    e.preventDefault();
+                }
+            });
+
+            document.addEventListener('click', (e) => {
+                const item = e.target.closest('.autocomplete-item');
+                if (item && autocompleteActiveInput) {
+                    autocompleteActiveInput.value = item.getAttribute('data-name');
+                    autocompleteActiveInput.dispatchEvent(new Event('input', { bubbles: true }));
+                    hideAutocomplete();
+                    return;
+                }
+                if (e.target.classList && e.target.classList.contains('food-autocomplete-input')) {
+                    return;
+                }
+                hideAutocomplete();
+            });
+
+            window.addEventListener('resize', () => {
+                if (autocompleteActiveInput) positionDropdown(autocompleteActiveInput);
+            });
+            window.addEventListener('scroll', () => {
+                if (autocompleteActiveInput) positionDropdown(autocompleteActiveInput);
+            }, true);
+        }
+
+        // Force reload DB from defaultDB if requested or update missing ones
+        function initDB() {
+            let localDB = JSON.parse(localStorage.getItem('macros_db'));
+            if (!localDB || localDB.length < defaultDB.length) {
+                localStorage.setItem('macros_db', JSON.stringify(defaultDB));
+                db = defaultDB;
+            }
+        }
+
+        // Initialize
+        initDB();
+        setupAutocomplete();
+        renderTargets();
+        renderMealSectionsEditor();
+        renderIngesta();
+        
+    </script>
+</body>
+</html>
